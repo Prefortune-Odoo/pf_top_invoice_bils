@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+
+pf_top_invoice_bils.account_top_customer_vendor_wizard,access_account_top_customer_vendor_wizard,pf_top_invoice_bils.model_account_top_customer_vendor_wizard,base.group_user,1,1,1,1,
