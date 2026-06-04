@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <menuitem id="account_top_customer_vendor_analysis"
+            name="Top Customers/Vendors"
+            parent="account.menu_finance_reports"
+            action="action_account_top_customer_vendor_wizard"
+            groups="account.group_account_readonly,account.group_account_invoice"
+            sequence="25"
+            />
+
+</odoo>

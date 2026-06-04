@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_top_customer_vendor_pdf" t-name="pf_top_invoice_bils.report_top_customer_vendor_pdf">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-set="res_company" t-value="doc.env.company"/>
+                <t t-call="web.external_layout">
+                    <style>
+                        /* General Page Styles */
+                        .page {
+                            font-family: 'Helvetica', 'Arial', sans-serif;
+                            color: #333;
+                        }
+
+                        /* Main Header */
+                        .report-header {
+                            text-align: center;
+                            margin-bottom: 20px;
+                        }
+                        .report-title {
+                            color: #6F4A67;
+                            font-weight: bold;
+                            font-size: 32px;
+                            margin-bottom: 5px;
+                            text-transform: uppercase;
+                        }
+                        .report-period {
+                            font-size: 20px;
+                            font-weight: bold;
+                            color: #666666;
+                        }
+                        .top-separator {
+                            border-top: 3px solid #6F4A67;
+                            margin-bottom: 20px;
+                        }
+
+                        /* Data Table */
+                        .main-table {
+                            width: 100%;
+                            border-collapse: collapse;
+                            font-size: 14px;
+                            border: 1px solid #dddddd;
+                        }
+                        .main-table thead tr {
+                            background-color: #6F4A67;
+                            color: white;
+                            text-align: center;
+                        }
+                        .main-table th {
+                            padding: 10px;
+                            font-weight: bold;
+                            border: 1px solid #dddddd;
+                        }
+                        .main-table td {
+                            padding: 8px;
+                            border: 1px solid #dddddd;
+                        }
+                        .text-center { text-align: center; }
+                        .font-bold { font-weight: bold; }
+
+                        /* Comparison Analysis Section */
+                        .comp-header {
+                            border-left: 5px solid #6F4A67;
+                            padding-left: 10px;
+                            margin-top: 40px;
+                            margin-bottom: 15px;
+                        }
+                        .comp-title {
+                            color: #6F4A67;
+                            font-weight: bold;
+                            font-size: 24px;
+                            text-transform: uppercase;
+                            margin: 0;
+                        }
+                        .comp-period-sub {
+                            font-size: 12px;
+                            color: #666;
+                        }
+
+                        /* Side-by-Side Boxes */
+                        .comp-container {
+                            width: 100%;
+                            clear: both;
+                            display: block;
+                        }
+                        .comp-box {
+                            width: 49%;
+                            float: left;
+                            min-height: 120px;
+                            padding: 10px;
+                            border-radius: 4px;
+                            box-sizing: border-box;
+                        }
+                        .box-new {
+                            background-color: #E8F5E9;
+                            margin-right: 1%;
+                        }
+                        .box-lost {
+                            background-color: #FCE4EC;
+                            margin-left: 1%;
+                        }
+                        .box-label-new { color: #2E7D32; font-weight: bold; font-size: 16px; }
+                        .box-label-lost { color: #D32F2F; font-weight: bold; font-size: 16px; }
+                        
+                        .comp-hr { 
+                            border: 0;
+                            border-top: 1px solid rgba(0,0,0,0.1); 
+                            margin: 8px 0; 
+                        }
+                        .comp-list { font-size: 13px; list-style-type: disc; padding-left: 20px; margin: 0; }
+                        .comp-empty { font-size: 13px; color: #757575; font-style: italic; }
+
+                        /* Footer */
+                        .report-footer {
+                            text-align: right;
+                            color: #666666;
+                            font-size: 12px;
+                        }
+                    </style>
+
+                    <div class="page">
+                        <div class="report-header">
+                            <h2 class="report-title">
+                                <t t-if="doc.type == 'top_customers'">TOP CUSTOMERS REPORT</t>
+                                <t t-else="">TOP VENDORS REPORT</t>
+                            </h2>
+                            <div class="report-period">
+                                Period: <span t-esc="doc._format_report_date(doc.from_date)"/>
+                                to <span t-esc="doc._format_report_date(doc.to_date)"/>
+                            </div>
+                        </div>
+
+                        <div class="top-separator"/>
+
+                        <table class="main-table">
+                            <thead>
+                                <tr>
+                                    <th style="width:10%;">Rank</th>
+                                    <th style="width:60%;">Partner Name</th>
+                                    <th style="width:30%;">
+                                        <t t-if="doc.report_by == 'total_amount'">Total Amount</t>
+                                        <t t-elif="doc.report_by == 'total_order'">Total Order</t>
+                                        <t t-else="">Total Quantity</t>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-if="docs._genrate_report_data()">
+                                    <t t-set="rank" t-value="1"/>
+                                    <t t-foreach="docs._genrate_report_data()" t-as="line">
+                                        <t t-if="line.get('total_amount', 0) > 0 or line.get('invoice_count', 0) > 0 or line.get('total_qty', 0) > 0">
+
+                                            <tr>
+                                                <td class="text-center font-bold"><span t-esc="rank"/></td>
+                                                <td class="font-bold"><span t-esc="line.get('partner_name')"/></td>
+                                                <td class="text-center font-bold">
+                                                    <t t-if="doc.report_by == 'total_amount'">
+                                                        <span t-esc="line.get('total_amount', 0.0)" t-options='{"widget": "monetary", "display_currency": res_company.currency_id}'/>
+                                                    </t>
+                                                    <t t-elif="doc.report_by == 'total_order'"><span t-esc="line.get('invoice_count', 0)"/></t>
+                                                    <t t-else=""><span t-esc="line.get('total_qty', 0.0)"/></t>
+                                                </td>
+                                            </tr>
+                                            <t t-set="rank" t-value="rank + 1"/>
+                                        </t>
+                                    </t>
+                                </t>
+
+                                <t t-else="">
+                                    <tr>
+                                        <td colspan="3" class="text-center">
+                                            No partner available for the selected period.
+                                        </td>
+                                    </tr>
+                                </t>
+                            
+                            </tbody>
+                        </table>
+
+                        <t t-if="doc.compare_with_previous_period == True">          
+                            <div class="comp-header">
+                                <h3 class="comp-title">Comparison Analysis</h3>
+                            </div>
+                            <div style="font-size:12px; color:#666; margin-bottom: 10px;">
+                                Comparison Period: <span t-esc="doc._format_report_date(doc.comparison_from_date)"/> to <span t-esc="doc._format_report_date(doc.comparison_to_date)"/>
+                            </div>
+    
+                            <div class="comp-container">
+                                <t t-set="comp_data" t-value="doc._get_comparison_data()"/>
+                                
+                                <div class="comp-box box-new">
+                                    <div class="box-label-new">
+                                        <i class="fa fa-user-plus" style="margin-right: 5px;"/> New Customers
+                                    </div>
+                                    <div class="comp-hr"/>
+                                    <t t-if="comp_data.get('new_partners')">
+                                        <ul class="comp-list">
+                                            <t t-foreach="comp_data['new_partners']" t-as="new_p">
+                                                <li><span t-esc="new_p.name"/></li>
+                                            </t>
+                                        </ul>
+                                    </t>
+                                    <t t-else="">
+                                        <div class="comp-empty">No new partners found.</div>
+                                    </t>
+                                </div>
+    
+                                <div class="comp-box box-lost">
+                                    <div class="box-label-lost">
+                                        <i class="fa fa-user-times" style="margin-right: 5px;"/> Lost Customers
+                                    </div>
+                                    <div class="comp-hr"/>
+                                    <t t-if="comp_data.get('lost_partners')">
+                                        <ul class="comp-list">
+                                            <t t-foreach="comp_data['lost_partners']" t-as="lost_p">
+                                                <li><span t-esc="lost_p.name"/></li>
+                                            </t>
+                                        </ul>
+                                    </t>
+                                    <t t-else="">
+                                        <div class="comp-empty">No lost partners found.</div>
+                                    </t>
+                                </div>
+                            </div>
+    
+                        </t>
+                        <div style="clear: both; height: 40px;"></div>
+                        
+                        <div class="report-footer">
+                            Report Generated on:
+                            <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d-%m-%Y %H:%M:%S')"/>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+
+    <!-- Report Action -->
+    <record id="action_report_top_customer_vendor_pdf" model="ir.actions.report">
+
+        <field name="name">Top Customers Report</field>
+        <field name="model">account.top.customer.vendor.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">pf_top_invoice_bils.report_top_customer_vendor_pdf</field>
+        <field name="report_file">pf_top_invoice_bils.report_top_customer_vendor_pdf</field>
+        <field name="print_report_name">
+            ('Top Vendors Report' if object.type == 'top_vendors' else 'Top Customers Report') + (' By Order' if object.report_by == 'total_order' else ' By Quantity' if object.report_by in ['total_qty', 'total_quantity'] else ' By Amount') + '-' + object.get_report_date()
+        </field>
+    </record>
+
+</odoo>
