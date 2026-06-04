@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="assets_backend" name="pf_top_invoice_bils assets" inherit_id="web.assets_backend">
+        <xpath expr="." position="inside">
+            <script type="text/javascript" src="/pf_top_invoice_bils/static/src/js/pf_dmy_date_field.js"/>
+        </xpath>
+    </template>
+</odoo>
