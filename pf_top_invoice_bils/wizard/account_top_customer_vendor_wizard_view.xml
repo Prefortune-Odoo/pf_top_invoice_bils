@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="account_top_customer_vendor_wizard_form" model="ir.ui.view">
+        <field name="name">account.top.customer.vendor.wizard.form</field>
+        <field name="model">account.top.customer.vendor.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <group string="PERIOD">
+                        <field name="from_date" widget="pf_dmy_date"/>
+                        <field name="to_date" widget="pf_dmy_date"/>
+                    </group>
+
+                    <group string="CONFIGURATION">
+                        <field name="type" widget="radio" options="{'horizontal': true}"/>
+                        <field name="top_count"></field>
+                        <field name="report_by"></field>
+                        <field name="invoice_status"/>
+                    </group>
+
+                </group>
+                
+                <group string="COMPARISON">
+                    <field name="compare_with_previous_period"></field>
+                    <field name="comparison_from_date" invisible="compare_with_previous_period == False" widget="pf_dmy_date"/>
+                    <field name="comparison_to_date" invisible="compare_with_previous_period == False" widget="pf_dmy_date"/>
+                </group>
+
+                <footer>
+                    <button string="Genrate PDF" type="object" name="report_pdf" class="oe_highlight"/>
+                    <button string="Generate Excel" type="object" name="report_xls" class="oe_highlight"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+                    
+            </form>        
+        </field>
+    </record>
+
+
+
+    <record id="action_account_top_customer_vendor_wizard" model="ir.actions.act_window">
+        <field name="name">Top Customers/Vendors</field>
+        <field name="res_model">account.top.customer.vendor.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="context">{}</field>
+        <field name="target">new</field>
+    </record>
+    
+    
+</odoo>
